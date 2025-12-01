@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Espaços Disponíveis</h2>
+
+<div class="row">
+    {% for space in spaces %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ space.name }}</h5>
+                <p class="card-text">{{ space.description }}</p>
+                <p><strong>Capacidade:</strong> {{ space.capacity }} pessoas</p>
+                <p><strong>Preço:</strong> R$ {{ space.price_per_hour }}/hora</p>
+                <button class="btn btn-primary">Reservar</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
