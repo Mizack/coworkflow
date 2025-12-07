@@ -13,11 +13,24 @@
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="/dashboard">Dashboard</a>
                 <a class="nav-link" href="/spaces">Espaços</a>
+                <a class="nav-link" href="/reservations">Reservas</a>
+                <a class="nav-link" href="/financial">Financeiro</a>
+                <a class="nav-link" href="/logout">Sair</a>
             </div>
         </div>
     </nav>
     
     <div class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </div>
     
