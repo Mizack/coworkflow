@@ -31,7 +31,11 @@ def login():
     if request.method == 'POST':
         response = requests.post(f'{API_BASE}/auth/login', json=request.form.to_dict())
         if response.status_code == 200:
-            session['token'] = response.json()['token']
+            data = response.json()
+            session['token'] = data['token']
+            session['role'] = data.get('role', 'user')
+            if session['role'] == 'admin':
+                return redirect('/admin')
             return redirect('/dashboard')
         flash('Credenciais inválidas')
     return render_template('login.html')
@@ -65,6 +69,10 @@ def spaces():
 def create_space():
     if 'token' not in session:
         return redirect('/login')
+    
+    if session.get('role') != 'admin':
+        flash('Acesso negado. Apenas administradores podem criar espaços.')
+        return redirect('/spaces')
     
     if request.method == 'POST':
         data = {
@@ -179,6 +187,81 @@ def financial():
     revenue = requests.get(f'{API_BASE}/financial/revenue', headers=get_headers()).json()
     expenses = requests.get(f'{API_BASE}/financial/expenses', headers=get_headers()).json()
     return render_template('financial.html', revenue=revenue, expenses=expenses)
+
+@app.route('/admin')
+def admin_dashboard():
+    if 'token' not in session or session.get('role') != 'admin':
+        flash('Acesso negado')
+        return redirect('/login')
+    
+    try:
+        analytics = requests.get(f'{API_BASE}/analytics/dashboard', headers=get_headers()).json()
+        spaces = requests.get(f'{API_BASE}/spaces').json()
+        revenue = requests.get(f'{API_BASE}/financial/revenue', headers=get_headers()).json()
+        return render_template('admin.html', analytics=analytics, spaces=spaces, revenue=revenue)
+    except:
+        flash('Erro ao carregar painel')
+        return redirect('/login')
+
+@app.route('/admin/users')
+def admin_users():
+    if 'token' not in session or session.get('role') != 'admin':
+        return redirect('/login')
+    return render_template('admin_users.html', users=list(requests.get(f'{API_BASE}/admin/users', headers=get_headers()).json()))
+
+@app.route('/admin/reservations')
+def admin_reservations():
+    if 'token' not in session or session.get('role') != 'admin':
+        return redirect('/login')
+    reservations = requests.get(f'{API_BASE}/admin/reservations', headers=get_headers()).json()
+    return render_template('admin_reservations.html', reservations=reservations)
+
+@app.route('/admin/notify', methods=['POST'])
+def admin_notify():
+    if 'token' not in session or session.get('role') != 'admin':
+        return redirect('/login')
+    
+    notify_type = request.form['type']
+    if notify_type == 'email':
+        data = {'to': request.form['to'], 'subject': 'CoworkFlow', 'body': request.form['message']}
+        requests.post(f'{API_BASE}/notify/email', json=data)
+    elif notify_type == 'sms':
+        data = {'phone': request.form['to'], 'message': request.form['message']}
+        requests.post(f'{API_BASE}/notify/sms', json=data)
+    elif notify_type == 'push':
+        data = {'user_id': int(request.form['to']), 'title': 'CoworkFlow', 'message': request.form['message']}
+        requests.post(f'{API_BASE}/notify/push', json=data)
+    
+    flash('Notificação enviada com sucesso!')
+    return redirect('/admin')
+
+@app.route('/spaces/<int:space_id>/edit', methods=['GET', 'POST'])
+def edit_space(space_id):
+    if 'token' not in session or session.get('role') != 'admin':
+        return redirect('/login')
+    
+    if request.method == 'POST':
+        data = {
+            'name': request.form['name'],
+            'description': request.form['description'],
+            'capacity': int(request.form['capacity']),
+            'price_per_hour': float(request.form['price_per_hour'])
+        }
+        requests.put(f'{API_BASE}/spaces/{space_id}', json=data, headers=get_headers())
+        flash('Espaço atualizado com sucesso!')
+        return redirect('/spaces')
+    
+    space = requests.get(f'{API_BASE}/spaces/{space_id}').json()
+    return render_template('edit_space.html', space=space)
+
+@app.route('/spaces/<int:space_id>/delete', methods=['POST'])
+def delete_space(space_id):
+    if 'token' not in session or session.get('role') != 'admin':
+        return redirect('/login')
+    
+    requests.delete(f'{API_BASE}/spaces/{space_id}', headers=get_headers())
+    flash('Espaço removido com sucesso!')
+    return redirect('/spaces')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)

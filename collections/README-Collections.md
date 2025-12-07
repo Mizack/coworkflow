@@ -31,14 +31,22 @@ Collections para testar todos os microsserviços do sistema CoworkFlow.
 
 ## Fluxo de Teste Recomendado
 
-1. **Cadastro e Login** (via API Gateway)
-2. **Criar Espaços**
-3. **Calcular Preços**
-4. **Criar Reservas**
-5. **Processar Pagamentos**
-6. **Fazer Check-in/Check-out**
-7. **Enviar Notificações**
-8. **Consultar Analytics e Financeiro**
+### Usuário Comum:
+1. **Cadastro Usuário** (role: user)
+2. **Login** (recebe token)
+3. **Listar Espaços**
+4. **Calcular Preço**
+5. **Criar Reserva**
+6. **Processar Pagamento**
+7. **Check-in/Check-out**
+
+### Administrador:
+1. **Cadastro Admin** (role: admin)
+2. **Login** (recebe token)
+3. **Criar Espaços**
+4. **Consultar Analytics**
+5. **Consultar Financeiro**
+6. **Enviar Notificações**
 
 ## Variáveis Importantes
 
@@ -48,12 +56,23 @@ Collections para testar todos os microsserviços do sistema CoworkFlow.
 
 ## Exemplos de Dados
 
-### Usuário de Teste
+### Usuário Comum
 ```json
 {
   "email": "usuario@exemplo.com",
   "password": "senha123",
-  "name": "João Silva"
+  "name": "João Silva",
+  "role": "user"
+}
+```
+
+### Administrador
+```json
+{
+  "email": "admin@exemplo.com",
+  "password": "admin123",
+  "name": "Admin Sistema",
+  "role": "admin"
 }
 ```
 

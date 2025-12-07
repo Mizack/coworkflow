@@ -76,10 +76,38 @@ def users_proxy(endpoint):
     except:
         return jsonify({'error': 'Service unavailable'}), 503
 
-@app.route('/spaces', methods=['GET', 'POST'])
+@app.route('/spaces', methods=['GET'])
+def spaces_get():
+    url = f"{SERVICES['ms-espacos']}/spaces"
+    try:
+        response = requests.get(url)
+        return response.json(), response.status_code
+    except:
+        return jsonify({'error': 'Service unavailable'}), 503
+
+@app.route('/spaces', methods=['POST'])
+def spaces_create():
+    if not verify_token():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        if data.get('role') != 'admin':
+            return jsonify({'error': 'Admin access required'}), 403
+    except:
+        return jsonify({'error': 'Invalid token'}), 401
+    
+    url = f"{SERVICES['ms-espacos']}/spaces"
+    try:
+        response = requests.post(url, json=request.get_json())
+        return response.json(), response.status_code
+    except:
+        return jsonify({'error': 'Service unavailable'}), 503
+
 @app.route('/spaces/<path:endpoint>', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def spaces_proxy(endpoint=''):
-    url = f"{SERVICES['ms-espacos']}/spaces" + (f"/{endpoint}" if endpoint else "")
+def spaces_proxy(endpoint):
+    url = f"{SERVICES['ms-espacos']}/spaces/{endpoint}"
     try:
         response = requests.request(
             method=request.method,
@@ -174,6 +202,55 @@ def financial_proxy(endpoint):
         return jsonify({'error': 'Unauthorized'}), 401
     
     url = f"{SERVICES['ms-financeiro']}/financial/{endpoint}"
+    try:
+        response = requests.get(url)
+        return response.json(), response.status_code
+    except:
+        return jsonify({'error': 'Service unavailable'}), 503
+
+@app.route('/notify/<path:endpoint>', methods=['POST'])
+def notify_proxy(endpoint):
+    url = f"{SERVICES['ms-notificacoes']}/notify/{endpoint}"
+    try:
+        response = requests.post(url, json=request.get_json())
+        return response.json(), response.status_code
+    except:
+        return jsonify({'error': 'Service unavailable'}), 503
+
+@app.route('/admin/users', methods=['GET'])
+def admin_users():
+    if not verify_token():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        if data.get('role') != 'admin':
+            return jsonify({'error': 'Admin access required'}), 403
+    except:
+        return jsonify({'error': 'Invalid token'}), 401
+    
+    url = f"{SERVICES['ms-usuarios']}/admin/users"
+    try:
+        response = requests.get(url)
+        return response.json(), response.status_code
+    except:
+        return jsonify({'error': 'Service unavailable'}), 503
+
+@app.route('/admin/reservations', methods=['GET'])
+def admin_reservations():
+    if not verify_token():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        if data.get('role') != 'admin':
+            return jsonify({'error': 'Admin access required'}), 403
+    except:
+        return jsonify({'error': 'Invalid token'}), 401
+    
+    url = f"{SERVICES['ms-reservas']}/admin/reservations"
     try:
         response = requests.get(url)
         return response.json(), response.status_code

@@ -30,7 +30,7 @@
           }
         },
         {
-          "name": "Cadastro",
+          "name": "Cadastro Usuário",
           "request": {
             "method": "POST",
             "header": [
@@ -41,7 +41,28 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"usuario@exemplo.com\",\n  \"password\": \"senha123\",\n  \"name\": \"João Silva\"\n}"
+              "raw": "{\n  \"email\": \"usuario@exemplo.com\",\n  \"password\": \"senha123\",\n  \"name\": \"João Silva\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/auth/signup",
+              "host": ["{{gateway_url}}"],
+              "path": ["auth", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Cadastro Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@exemplo.com\",\n  \"password\": \"admin123\",\n  \"name\": \"Admin Sistema\",\n  \"role\": \"admin\"\n}"
             },
             "url": {
               "raw": "{{gateway_url}}/auth/signup",
@@ -148,6 +169,74 @@
               "raw": "{{gateway_url}}/payments/charge",
               "host": ["{{gateway_url}}"],
               "path": ["payments", "charge"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notificações",
+      "item": [
+        {
+          "name": "Enviar Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"usuario@exemplo.com\",\n  \"subject\": \"Confirmação de Reserva\",\n  \"body\": \"Sua reserva foi confirmada\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/notify/email",
+              "host": ["{{gateway_url}}"],
+              "path": ["notify", "email"]
+            }
+          }
+        },
+        {
+          "name": "Enviar SMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+5511999999999\",\n  \"message\": \"Lembrete de reserva\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/notify/sms",
+              "host": ["{{gateway_url}}"],
+              "path": ["notify", "sms"]
+            }
+          }
+        },
+        {
+          "name": "Enviar Push",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"title\": \"Check-in Disponível\",\n  \"message\": \"Você já pode fazer check-in\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/notify/push",
+              "host": ["{{gateway_url}}"],
+              "path": ["notify", "push"]
             }
           }
         }

@@ -3,7 +3,9 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Espaços Disponíveis</h2>
+    {% if session.get('role') == 'admin' %}
     <a href="/spaces/create" class="btn btn-success">Criar Espaço</a>
+    {% endif %}
 </div>
 
 <div class="row">
@@ -16,6 +18,12 @@
                 <p><strong>Capacidade:</strong> {{ space.capacity }} pessoas</p>
                 <p><strong>Preço:</strong> R$ {{ space.price_per_hour }}/hora</p>
                 <a href="/reserve/{{ space.id }}" class="btn btn-primary">Reservar</a>
+                {% if session.get('role') == 'admin' %}
+                <a href="/spaces/{{ space.id }}/edit" class="btn btn-warning btn-sm">Editar</a>
+                <form method="POST" action="/spaces/{{ space.id }}/delete" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Deletar espaço?')">Deletar</button>
+                </form>
+                {% endif %}
             </div>
         </div>
     </div>
