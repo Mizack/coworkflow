@@ -1,0 +1,30 @@
+# Testing dependencies
+pytest==7.4.3
+pytest-html==4.1.1
+pytest-cov==4.1.0
+pytest-xdist==3.5.0
+pytest-mock==3.12.0
+
+# Selenium for UI tests
+selenium==4.15.2
+webdriver-manager==4.0.1
+
+# API testing
+requests==2.31.0
+httpx==0.25.2
+
+# Load testing
+locust==2.17.0
+
+# Test data generation
+faker==20.1.0
+
+# Coverage reporting
+coverage==7.3.2
+
+# Performance testing
+k6==0.1.0
+
+# Database testing
+pytest-postgresql==5.0.0
+psycopg2-binary==2.9.9
